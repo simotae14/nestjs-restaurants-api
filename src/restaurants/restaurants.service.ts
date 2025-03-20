@@ -43,4 +43,9 @@ export class RestaurantsService {
       runValidators: true,
     });
   }
+
+  // Delete a Restaurant by ID => DELETE /restaurants/:id
+  async deleteById(id: string): Promise<Restaurant | null> {
+    return await this.restaurantModel.findByIdAndDelete(id);
+  }
 }
