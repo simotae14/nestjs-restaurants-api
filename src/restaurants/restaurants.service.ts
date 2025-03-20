@@ -13,6 +13,10 @@ export class RestaurantsService {
 
   // Get All Restaurants => GET /restaurants
   async findAll(query: Query): Promise<Restaurant[]> {
+    const resultsPerPage = 2;
+    const currentPage = Number(query.page) || 1;
+    const skip = resultsPerPage * (currentPage - 1);
+
     const keyword = query.keyword
       ? {
           name: {
@@ -21,7 +25,11 @@ export class RestaurantsService {
           },
         }
       : {};
-    const restaurants = await this.restaurantModel.find({ ...keyword });
+    const restaurants = await this.restaurantModel
+      .find({ ...keyword })
+      .limit(resultsPerPage)
+      .skip(skip);
+
     return restaurants;
   }
 
