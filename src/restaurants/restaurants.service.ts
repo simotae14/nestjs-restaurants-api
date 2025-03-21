@@ -16,7 +16,7 @@ export class RestaurantsService {
     private restaurantModel: mongoose.Model<Restaurant>,
   ) {}
 
-  // Get All Restaurants => GET /restaurants
+  // Get All Restaurants => GET /api/restaurants
   async findAll(query: Query): Promise<Restaurant[]> {
     const resultsPerPage = 2;
     const currentPage = Number(query.page) || 1;
@@ -38,7 +38,7 @@ export class RestaurantsService {
     return restaurants;
   }
 
-  // Create a Restaurant => POST /restaurants
+  // Create a Restaurant => POST /api/restaurants
   async create(restaurant: Restaurant): Promise<Restaurant> {
     const location = await APIFeatures.getRestaurantLocation(
       restaurant.address,
@@ -49,7 +49,7 @@ export class RestaurantsService {
     return res;
   }
 
-  // Get a Restaurant by ID => GET /restaurants/:id
+  // Get a Restaurant by ID => GET /api/restaurants/:id
   async findById(id: string): Promise<Restaurant> {
     const isValidId = mongoose.isValidObjectId(id);
 
@@ -68,7 +68,7 @@ export class RestaurantsService {
     return restaurant;
   }
 
-  // Update a Restaurant by ID => PUT /restaurants/:id
+  // Update a Restaurant by ID => PUT /api/restaurants/:id
   async updateById(
     id: string,
     restaurant: Restaurant,
@@ -79,8 +79,15 @@ export class RestaurantsService {
     });
   }
 
-  // Delete a Restaurant by ID => DELETE /restaurants/:id
+  // Delete a Restaurant by ID => DELETE /api/restaurants/:id
   async deleteById(id: string): Promise<Restaurant | null> {
     return await this.restaurantModel.findByIdAndDelete(id);
+  }
+
+  // Upload Images => PUT /api/restaurants/upload/:id
+  async uploadImages(id: string, files: any) {
+    const images = await APIFeatures.uploadImages(files);
+    console.log(images);
+    return images;
   }
 }

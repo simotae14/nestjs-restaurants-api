@@ -73,11 +73,13 @@ export class RestaurantsController {
 
   @Put('upload/:id')
   @UseInterceptors(FilesInterceptor('files'))
-  uploadFiles(
+  async uploadFiles(
     @Param('id') id: string,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log(id);
-    console.log(files);
+    await this.restaurantService.findById(id);
+
+    const res = await this.restaurantService.uploadImages(id, files);
+    return res;
   }
 }
