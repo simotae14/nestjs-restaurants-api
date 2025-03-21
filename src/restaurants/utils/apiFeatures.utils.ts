@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+
+import { Location } from '../schemas/restaurant.schema';
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 const nodeGeoCoder = require('node-geocoder');
 
@@ -28,7 +31,7 @@ export default class APIFeatures {
         countryCode,
       } = loc[0];
 
-      const location = {
+      const location: Location = {
         type: 'Point',
         coordinates: [longitude, latitude],
         formattedAddress,
