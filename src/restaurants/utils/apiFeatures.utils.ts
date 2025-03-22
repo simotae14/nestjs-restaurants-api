@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import { S3 } from 'aws-sdk';
 import { Location } from '../schemas/restaurant.schema';
+import { Delete } from '@nestjs/common';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 const nodeGeoCoder = require('node-geocoder');
@@ -76,6 +78,40 @@ export default class APIFeatures {
 
         if (images.length === files.length) {
           resolve(images);
+        }
+      });
+    });
+  }
+
+  // Delete Images
+  static async deleteImages(images?: object[]) {
+    const s3 = new S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_KEY,
+    });
+
+    const imageskeys =
+      images?.map((image: any) => {
+        return {
+          Key: image.Key,
+        };
+      }) || [];
+
+    const params = {
+      Bucket: `${process.env.AWS_S3_BUCKET_NAME}`,
+      Delete: {
+        Objects: imageskeys,
+        Quiet: false,
+      },
+    };
+
+    return new Promise((resolve, reject) => {
+      s3.deleteObjects(params, function (err, data) {
+        if (err) {
+          console.log(err);
+          reject(false); // saying the deletion was not successful
+        } else {
+          resolve(true);
         }
       });
     });
