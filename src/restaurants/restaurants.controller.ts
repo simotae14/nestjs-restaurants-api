@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Body,
   Controller,
@@ -7,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  // Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -19,6 +21,8 @@ import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../auth/schemas/user.schema';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -26,7 +30,12 @@ export class RestaurantsController {
 
   @Get()
   @UseGuards(AuthGuard())
-  async getAllRestaurants(@Query() query: ExpressQuery): Promise<Restaurant[]> {
+  async getAllRestaurants(
+    @Query() query: ExpressQuery,
+    // @Req() req,
+    @CurrentUser() user: User,
+  ): Promise<Restaurant[]> {
+    console.log(user);
     return this.restaurantService.findAll(query);
   }
 
