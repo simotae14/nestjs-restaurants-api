@@ -13,16 +13,19 @@ import { SignupDTO } from './dto/signup.dto';
 
 import * as bcrypt from 'bcryptjs';
 import { LoginDTO } from './dto/login.dto';
+import APIFeatures from '../restaurants/utils/apiFeatures.utils';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<User>,
+    private jwtService: JwtService,
   ) {}
 
   // Register User
-  async signUp(signUpDto: SignupDTO): Promise<User> {
+  async signUp(signUpDto: SignupDTO): Promise<{ token: string }> {
     const { name, email, password } = signUpDto;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -34,7 +37,12 @@ export class AuthService {
         password: hashedPassword,
       });
 
-      return user;
+      const token = await APIFeatures.assignJwtToken(
+        user._id as string,
+        this.jwtService,
+      );
+
+      return { token };
     } catch (error) {
       // Handle duplicate email
       if (error?.cause?.code === 11000) {
@@ -46,7 +54,7 @@ export class AuthService {
   }
 
   // Login User
-  async login(loginDto: LoginDTO): Promise<User> {
+  async login(loginDto: LoginDTO): Promise<{ token: string }> {
     const { email, password } = loginDto;
 
     // search for user
@@ -63,6 +71,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email address or password.');
     }
 
-    return user;
+    const token = await APIFeatures.assignJwtToken(
+      user._id as string,
+      this.jwtService,
+    );
+
+    return { token };
   }
 }

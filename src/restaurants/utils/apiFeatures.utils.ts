@@ -5,7 +5,7 @@
 
 import { S3 } from 'aws-sdk';
 import { Location } from '../schemas/restaurant.schema';
-import { Delete } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 const nodeGeoCoder = require('node-geocoder');
@@ -115,5 +115,18 @@ export default class APIFeatures {
         }
       });
     });
+  }
+
+  // Assign JWT Token
+  static async assignJwtToken(
+    userId: string,
+    jwtService: JwtService,
+  ): Promise<string> {
+    const payload = { id: userId };
+
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    const token = await jwtService.sign(payload);
+
+    return token;
   }
 }
