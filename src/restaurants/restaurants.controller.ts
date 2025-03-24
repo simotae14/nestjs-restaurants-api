@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Body,
   Controller,
@@ -8,7 +7,6 @@ import {
   Post,
   Put,
   Query,
-  // Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -29,22 +27,18 @@ export class RestaurantsController {
   constructor(private restaurantService: RestaurantsService) {}
 
   @Get()
-  @UseGuards(AuthGuard())
-  async getAllRestaurants(
-    @Query() query: ExpressQuery,
-    // @Req() req,
-    @CurrentUser() user: User,
-  ): Promise<Restaurant[]> {
-    console.log(user);
+  async getAllRestaurants(@Query() query: ExpressQuery): Promise<Restaurant[]> {
     return this.restaurantService.findAll(query);
   }
 
   @Post()
+  @UseGuards(AuthGuard())
   async createRestaurant(
     @Body()
     restaurant: CreateRestaurantDto,
+    @CurrentUser() user: User,
   ): Promise<Restaurant> {
-    return this.restaurantService.create(restaurant);
+    return this.restaurantService.create(restaurant, user);
   }
 
   @Get(':id')
