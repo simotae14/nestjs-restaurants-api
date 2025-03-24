@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-base-to-string */
 import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -35,7 +39,7 @@ export class RestaurantsController {
 
   @Post()
   @UseGuards(AuthGuard(), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'user')
   async createRestaurant(
     @Body()
     restaurant: CreateRestaurantDto,
@@ -59,8 +63,12 @@ export class RestaurantsController {
     id: string,
     @Body()
     restaurant: UpdateRestaurantDto,
+    @CurrentUser() user: User,
   ): Promise<Restaurant | null> {
-    await this.restaurantService.findById(id);
+    const res = await this.restaurantService.findById(id);
+    if (res.user.toString() !== (user as any)._id.toString()) {
+      throw new ForbiddenException('You can not update this restaurant.');
+    }
 
     return this.restaurantService.updateById(id, restaurant);
   }
@@ -70,8 +78,12 @@ export class RestaurantsController {
   async deleteRestaurant(
     @Param('id')
     id: string,
+    @CurrentUser() user: User,
   ): Promise<{ deleted: boolean }> {
     const restaurant = await this.restaurantService.findById(id);
+    if (restaurant.user.toString() !== (user as any)._id.toString()) {
+      throw new ForbiddenException('You can not delete this restaurant.');
+    }
 
     const isDeleted = await this.restaurantService.deleteImages(
       restaurant.images,
