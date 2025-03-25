@@ -35,7 +35,9 @@ export enum Category {
   FINE_DINING = 'Fine Dining',
 }
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Restaurant {
   @Prop()
   name: string;
