@@ -20,6 +20,11 @@ export class MealController {
     return this.mealService.findByRestaurant(id);
   }
 
+  @Get(':id')
+  async getMeal(@Param('id') id: string): Promise<Meal> {
+    return this.mealService.findById(id);
+  }
+
   @Post()
   @UseGuards(AuthGuard())
   createMeal(

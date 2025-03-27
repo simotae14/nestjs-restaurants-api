@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-base-to-string */
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -53,5 +54,21 @@ export class MealService {
     await restaurant.save();
 
     return mealCreated;
+  }
+
+  // Get single meal  =>  GET  /api/meals/id
+  async findById(id: string): Promise<Meal> {
+    // check if the id is valid
+    const isValidId = mongoose.isValidObjectId(id);
+    if (!isValidId) {
+      throw new BadRequestException('Wrong mongoose ID error.');
+    }
+    const meal = await this.mealModel.findById(id);
+
+    if (!meal) {
+      throw new NotFoundException('Meal not found with this ID.');
+    }
+
+    return meal;
   }
 }
