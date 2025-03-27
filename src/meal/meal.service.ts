@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-base-to-string */
 import {
   ForbiddenException,
@@ -19,6 +18,18 @@ export class MealService {
     @InjectModel(Restaurant.name)
     private restaurantModel: mongoose.Model<Restaurant>,
   ) {}
+
+  // Get all meals  =>  GET  /api/meals
+  async findAll(): Promise<Meal[]> {
+    const meals = await this.mealModel.find();
+    return meals;
+  }
+
+  // Get all meals of a restaurant  =>  GET  /api/meals/restaurant
+  async findByRestaurant(restaurantId: string): Promise<Meal[]> {
+    const meals = await this.mealModel.find({ restaurant: restaurantId });
+    return meals;
+  }
 
   // Create a new meal  =>  POST  /api/meals/restaurant/:id
   async create(meal: Meal, user: User): Promise<Meal> {
