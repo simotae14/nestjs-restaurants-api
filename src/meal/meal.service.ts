@@ -85,4 +85,23 @@ export class MealService {
 
     return updatedMeal;
   }
+
+  // Delete a Meal by ID => DELETE /api/meals/:id
+  async deleteById(id: string): Promise<{ deleted: boolean }> {
+    const res = await this.mealModel.findByIdAndDelete(id);
+
+    const restaurant = await this.restaurantModel.findById(res?.restaurant);
+
+    if (!restaurant) {
+      throw new NotFoundException('Restaurant not found with this ID.');
+    }
+
+    const mealObjectId = new mongoose.Types.ObjectId(id);
+    restaurant.menu = restaurant.menu?.filter(
+      (menuId) => !menuId.equals(mealObjectId),
+    );
+    await restaurant.save();
+
+    return { deleted: !!res };
+  }
 }

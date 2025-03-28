@@ -4,6 +4,7 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -61,5 +62,21 @@ export class MealController {
     }
 
     return this.mealService.updateById(id, updateMealDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard())
+  async deleteMeal(
+    @Param('id')
+    id: string,
+    @CurrentUser() user: User,
+  ): Promise<{ deleted: boolean }> {
+    const meal = await this.mealService.findById(id);
+
+    if (meal.user.toString() !== (user as any)._id.toString()) {
+      throw new ForbiddenException('You can not update this meal.');
+    }
+
+    return this.mealService.deleteById(id);
   }
 }
