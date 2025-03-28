@@ -71,4 +71,18 @@ export class MealService {
 
     return meal;
   }
+
+  // Update meal  =>  PUT  /api/meals/:id
+  async updateById(id: string, meal: Meal): Promise<Meal> {
+    const updatedMeal = await this.mealModel.findByIdAndUpdate(id, meal, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedMeal) {
+      throw new NotFoundException('Meal not found with this ID.');
+    }
+
+    return updatedMeal;
+  }
 }
