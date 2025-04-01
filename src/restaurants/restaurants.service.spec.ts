@@ -168,14 +168,13 @@ describe('RestaurantsService', () => {
 
   describe('deleteById', () => {
     it('should delete the restaurant', async () => {
-      const deletedMessage = { deleted: true };
       jest
         .spyOn(model, 'findByIdAndDelete')
-        .mockResolvedValueOnce(deletedMessage);
+        .mockResolvedValueOnce(mockRestaurant);
 
       const result = await service.deleteById(mockRestaurant._id);
 
-      expect(result).toEqual(deletedMessage);
+      expect(result).toEqual(mockRestaurant);
     });
   });
 });
