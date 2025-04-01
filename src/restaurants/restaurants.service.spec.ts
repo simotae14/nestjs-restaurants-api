@@ -219,4 +219,26 @@ describe('RestaurantsService', () => {
       expect(result).toEqual(updatedRestaurant);
     });
   });
+
+  describe('deleteImages', () => {
+    it('should delete restaurant images from S3 bucket', async () => {
+      const mockImages = [
+        {
+          ETag: '"0b788687d942457e754e3f88610f0941"',
+          ServerSideEncryption: 'AES256',
+          Location:
+            'https://nestjs-restaurant-api-tae.s3.amazonaws.com/restaurants/moss_1743548001866.jpeg',
+          key: 'restaurants/moss_1743548001866.jpeg',
+          Key: 'restaurants/moss_1743548001866.jpeg',
+          Bucket: 'nestjs-restaurant-api-tae',
+        },
+      ];
+
+      jest.spyOn(APIFeatures, 'deleteImages').mockResolvedValueOnce(true);
+
+      const result = await service.deleteImages(mockImages);
+
+      expect(result).toBe(true);
+    });
+  });
 });
