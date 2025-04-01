@@ -4,6 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
 import { RestaurantsService } from './restaurants.service';
 import { Restaurant } from './schemas/restaurant.schema';
+import { User, UserRoles } from '../auth/schemas/user.schema';
+import APIFeatures from './utils/apiFeatures.utils';
 
 const mockRestaurant = {
   _id: '67e33754c600340de975a2ee',
@@ -29,8 +31,17 @@ const mockRestaurant = {
   updatedAt: '2025-03-28T23:10:01.957Z',
 };
 
+const mockUser = {
+  _id: '67e1e795f51290a8f81db3b1',
+  email: 'startae@gmail.com',
+  name: 'Simone',
+  password: '12345678',
+  role: UserRoles.USER,
+};
+
 const mockRestaurantService = {
   find: jest.fn(),
+  create: jest.fn(),
 };
 describe('RestaurantsService', () => {
   let service: RestaurantsService;
@@ -69,6 +80,34 @@ describe('RestaurantsService', () => {
       // call the service method
       const restaurants = await service.findAll({ keyword: 'restaurant' });
       expect(restaurants).toEqual([mockRestaurant]);
+    });
+  });
+
+  describe('create', () => {
+    const newRestaurant = {
+      category: 'Fast Food',
+      name: 'Retaurant fast food 2',
+      address: '200 Olympic Dr, Stafford, VS, 22554',
+      phoneNo: 9788246116,
+      email: 'ghulam@gamil.com',
+      description: 'This is just a description',
+    };
+
+    it('should create a new restaurant', async () => {
+      jest
+        .spyOn(APIFeatures, 'getRestaurantLocation')
+        .mockImplementationOnce(() => Promise.resolve(mockRestaurant.location));
+
+      jest
+        .spyOn(model, 'create')
+        .mockImplementationOnce(() => Promise.resolve(mockRestaurant as any));
+
+      const result = await service.create(
+        newRestaurant as Restaurant,
+        mockUser as User,
+      );
+
+      expect(result).toEqual(mockRestaurant);
     });
   });
 });
