@@ -45,6 +45,7 @@ const mockRestaurantService = {
   create: jest.fn(),
   findById: jest.fn(),
   findByIdAndUpdate: jest.fn(),
+  findByIdAndDelete: jest.fn(),
 };
 
 describe('RestaurantsService', () => {
@@ -162,6 +163,19 @@ describe('RestaurantsService', () => {
       );
 
       expect(updatedRestaurant?.name).toEqual(restaurant.name);
+    });
+  });
+
+  describe('deleteById', () => {
+    it('should delete the restaurant', async () => {
+      const deletedMessage = { deleted: true };
+      jest
+        .spyOn(model, 'findByIdAndDelete')
+        .mockResolvedValueOnce(deletedMessage);
+
+      const result = await service.deleteById(mockRestaurant._id);
+
+      expect(result).toEqual(deletedMessage);
     });
   });
 });
