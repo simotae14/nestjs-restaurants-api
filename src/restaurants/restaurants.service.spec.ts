@@ -177,4 +177,46 @@ describe('RestaurantsService', () => {
       expect(result).toEqual(mockRestaurant);
     });
   });
+
+  describe('uploadImages', () => {
+    it('should upload restaurant images on S3 bucket', async () => {
+      const mockImages = [
+        {
+          ETag: '"0b788687d942457e754e3f88610f0941"',
+          ServerSideEncryption: 'AES256',
+          Location:
+            'https://nestjs-restaurant-api-tae.s3.amazonaws.com/restaurants/moss_1743548001866.jpeg',
+          key: 'restaurants/moss_1743548001866.jpeg',
+          Key: 'restaurants/moss_1743548001866.jpeg',
+          Bucket: 'nestjs-restaurant-api-tae',
+        },
+      ];
+
+      const updatedRestaurant = {
+        ...mockRestaurant,
+        images: mockImages,
+      };
+
+      jest.spyOn(APIFeatures, 'uploadImages').mockResolvedValueOnce(mockImages);
+
+      jest
+        .spyOn(model, 'findByIdAndUpdate')
+        .mockResolvedValueOnce(updatedRestaurant as any);
+
+      const files = [
+        {
+          fieldname: 'files',
+          originalname: 'moss_1743548001866.jpg',
+          encoding: '7bit',
+          mimetype: 'image/jpeg',
+          size: 123456,
+          buffer:
+            '<Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 01 00 48 00 48 00 00 ff db 00 43 00 0c 08 08 08 09 08 0c 0b 0a 0b 0e 0d 0c 0e 12 1a 12 12 11 11 12 24 18 19 15 1a 2d 24 ... 123406 more bytes>',
+        },
+      ];
+      const result = await service.uploadImages(mockRestaurant._id, files);
+
+      expect(result).toEqual(updatedRestaurant);
+    });
+  });
 });
